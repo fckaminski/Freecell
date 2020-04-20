@@ -2,3 +2,5 @@ Freecell
 --------
 
 Web-based version of freecell using javascript and jQuery.
+
+Features added to the original: undo move, auto complete, cascade stack move and game selector using Microsoft Freecell numbers.
