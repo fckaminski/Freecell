@@ -71,7 +71,7 @@ ul {
 }
 
 #table {
-    background-color: #04B404;
+    background-color: #378cab;
     width: 720px;
     height: 700px;
     margin-left: auto;
@@ -87,3 +87,14 @@ ul {
     -webkit-box-shadow: 15px 15px 15px #888888;
     box-shadow: 15px 15px 15px #888888;
 }
+
+#buttons {
+	width: 720px;
+    display: flex;
+    margin: auto;	
+    flex-flow: row wrap;
+    justify-content: space-around;
+    font-size: 0.7em;
+}
+
+
