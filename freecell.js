@@ -10,8 +10,7 @@ var Game = function() {
     this.columns = [[], [], [], [], [], [], [], []];
     // the deck of cards
     this.deck = new this.Deck();
-    
-	this.auto_drag = false;
+ 
 	this.moves_list = [];
 	this.cards_left = 52;
 };
@@ -248,10 +247,10 @@ Game.prototype.get_cards = function(card_id) {
 		
 		 // loop through the middle of each column
         for (j = col.length-1; j >=0; j--) {		
-		   card = col[j];
-           if (card.id === card_id)  {
-    	      return col.splice(j, col.length);  //extract the stacked cards from the column array
-		   }
+		    card = col[j];
+            if (card.id === card_id)  {
+    	        return col.splice(j, col.length);  //extract the stacked cards from the column array
+		    }
         }
     }
 
@@ -287,9 +286,9 @@ Game.prototype.is_game_won = function() {
     var i, card;
 
      if (this.cards_left===0)
-		     return true;
+		return true;
 	else
-            return false;
+        return false;
 };
 
 /******************************************************************************/
@@ -343,8 +342,8 @@ Game.prototype.Deck.prototype.shuffle = function(rand) {
     var j, swap; 	  
     for (i = 0; i < len; i++) {
         rand = (rand * 214013 + 2531011) & 0x7FFFFFFF;
-		    j = 51 - (rand >> 16) % (52 - i);
-		    swap = this.cards[i], this.cards[i] = this.cards[j], this.cards[j] = swap;      
+		j = 51 - (rand >> 16) % (52 - i);
+		swap = this.cards[i], this.cards[i] = this.cards[j], this.cards[j] = swap;      
     }    
 };
 
@@ -379,27 +378,6 @@ Game.prototype.Deck.prototype.Card = function(id, suit, value, colour) {
 };
 
 /**
- * does this card and another card share the same suit?
- */
-Game.prototype.Deck.prototype.Card.prototype.sameSuit = function(other) {
-    return this.suit === other.suit;
-};
-
-/**
- * does this card and another card share the same colour?
- */
-Game.prototype.Deck.prototype.Card.prototype.sameColour = function(other) {
-    return this.colour === other.colour;
-};
-
-/**
- * does this card and another card share the same value?
- */
-Game.prototype.Deck.prototype.Card.prototype.sameValue = function(other) {
-    return this.value === other.value;
-};
-
-/**
  * The image name and location as a string. Used when creating the web page.
  */
 Game.prototype.Deck.prototype.Card.prototype.image = function() {
@@ -417,6 +395,8 @@ var UI = function(game) {
     this.drag = [];
     // an array of all the droppables
     this.drop = [];
+	
+	this.auto_complete = false;
 };
 
 /**
@@ -451,7 +431,7 @@ UI.prototype.undo_move = function() {
 
     //drops last move	 
     this.game.moves_list.pop();
-	this.game.auto_drag = false;
+	this.auto_complete = false;
 	
 	
 	 //Reset game	
@@ -463,11 +443,11 @@ UI.prototype.undo_move = function() {
 
     //replays moves previously stored
     for(var i=0; i<this.game.moves_list.length; i++)
-       this.replay_move(this.game.moves_list[i].drag_column, this.game.moves_list[i].drop_id, this);
+        this.replay_move(this.game.moves_list[i].drag_column, this.game.moves_list[i].drop_id, this);
 
   
     this.clear_drag()();
-	this.game.auto_drag = document.getElementById('auto_drag').checked;
+	this.auto_complete = document.getElementById('auto_drag').checked;
 };
 
 
@@ -523,8 +503,8 @@ UI.prototype.create_draggables = function() {
     this_ui = this;
     
 	//Trys to auto-drag card if auto-complete is set
-	if(this.game.auto_drag)
-       this_ui.auto_drag();
+	if(this.auto_complete)
+        this_ui.auto_drag();
     
     card_ids = this.game.valid_drag_ids();
     card_count = card_ids.length;
@@ -536,23 +516,23 @@ UI.prototype.create_draggables = function() {
 		var stack_cards_id = [];
         for (j = 0; j <  card_ids[i].length; j++) {
 	 		
-		   id = card_ids[i][j];
-		   card_div = $('#' + id);
+		    id = card_ids[i][j];
+		    card_div = $('#' + id);
 		   
-		   //add to the list of draggables
-           this_ui.drag.push(card_div);
+		    //add to the list of draggables
+            this_ui.drag.push(card_div);
 		   
-		   stack_cards_id.push(id);   //id list from cards tht have to be moved first
+		    stack_cards_id.push(id);   //id list from cards tht have to be moved first
 						 
-           card_div.draggable({
-               stack: '.card',     //controls the z-index of the set of elements that match the selector, always brings the currently dragged item to the front.
-               containment: '#table',
-               revert: 'invalid',   //revert will only occur if the draggable has not been dropped on a droppable	   			   
-               revertDuration: 200,
-               start: this_ui.create_droppables( stack_cards_id.slice() ),      	  
-               stop: this_ui.clear_drag()   
-           });	   
-		   card_div.draggable('enable');
+            card_div.draggable({
+                stack: '.card',     //controls the z-index of the set of elements that match the selector, always brings the currently dragged item to the front.
+                containment: '#table',
+                revert: 'invalid',   //revert will only occur if the draggable has not been dropped on a droppable	   			   
+                revertDuration: 200,
+                start: this_ui.create_droppables( stack_cards_id.slice() ),      	  
+                stop: this_ui.clear_drag()   
+            });	   
+		    card_div.draggable('enable');
 		   
 			// add double-click event handling to draggables that are not in the middle of columns
 			if(j==0)
@@ -573,9 +553,9 @@ UI.prototype.create_draggables = function() {
 
         //Adjust stacked cards z-indices after a returned stack drag
 		for(k = stack_cards_id.length-1 ; k >= 0; k--)  {		  
-		   card_div = $('#' +  stack_cards_id[k]);
-		   max_z = this_ui.card_max_zindex();
-		   card_div.css('z-index', max_z + 1);
+		    card_div = $('#' +  stack_cards_id[k]);
+		    max_z = this_ui.card_max_zindex();
+		    card_div.css('z-index', max_z + 1);
 		}
     }
 };
@@ -598,7 +578,7 @@ UI.prototype.dblclick_draggable = function(event) {
     for (i = 0; i < drop_len; i++) {
         drop_id = drop_ids[i];
         if (drop_id.substr(0, 4) === 'suit') {
-            this_ui.dblclick_move(card_id, drop_id, this_ui);
+            this_ui.animated_move(card_id, drop_id, this_ui);
             return;
         }
     }
@@ -607,7 +587,7 @@ UI.prototype.dblclick_draggable = function(event) {
     for (i = 0; i < drop_len; i++) {
         drop_id = drop_ids[i];
         if (drop_id.substr(0, 4) === 'free') {
-            this_ui.dblclick_move(card_id, drop_id, this_ui);
+            this_ui.animated_move(card_id, drop_id, this_ui);
             return;
         }
     }
@@ -621,7 +601,7 @@ UI.prototype.dblclick_draggable = function(event) {
  */
 UI.prototype.auto_drag = function() {
 	
-   var i, card_ids, card_count, card_id, card_div, this_ui;
+   var i, card_ids, card_count, card_id, card_div, this_ui, k;
     this_ui = this;
     
     card_ids = this_ui.game.valid_drag_ids();
@@ -640,8 +620,8 @@ UI.prototype.auto_drag = function() {
             if (suit_card === null) {
                 // if the card being dragged is an ace then this is a valid drop
                 if (drag_card.value === 1) {
-                   this_ui.dblclick_move(card_id, 'suit' + j.toString(), this_ui);	  
-                   return;
+                    this_ui.animated_move(card_id, 'suit' + j.toString(), this_ui);
+                    return;
                 }
             } 
             else {
@@ -652,24 +632,24 @@ UI.prototype.auto_drag = function() {
                    //we can auto drag, but should we?
 			    	var do_drag = 0
 				
-				   if(drag_card.value === 2)
+				    if(drag_card.value === 2)
 				    	do_drag = 2;
 				
-				   //check if the card could be still useful for the opposite colour columns stacking
-			       for (k = 0; k < 4; k++) 
-				      if(this.game.suits[k] != null)
-				         if(this.game.suits[k].colour != suit_card.colour)
-				    	    if(this.game.suits[k].value + 2>= drag_card.value)
-				               do_drag++;
+				    //check if the card could be still useful for the opposite colour columns stacking
+			        for (k = 0; k < 4; k++) 
+				        if(this.game.suits[k] != null)
+				            if(this.game.suits[k].colour != suit_card.colour)
+				     	        if(this.game.suits[k].value + 2>= drag_card.value)
+				                    do_drag++;
 				
-                if(do_drag>=2)  {    	              	         	
-                   this_ui.dblclick_move(card_id, 'suit' + j.toString(), this_ui);
-                   return;  
-                }                         
-             }
-          }
-       }   	     	  
-    }    
+                    if(do_drag>=2)  {					
+                        this_ui.animated_move(card_id, 'suit' + j.toString(), this_ui);
+                        return;  
+                    }                         
+                }
+            }
+        }   	     	  
+    } 
    return;
 };
 
@@ -699,18 +679,18 @@ UI.prototype.replay_move = function(drag_column, drop_id, this_ui) {
         card_div = $('#' + drag_column[i].id);
 			
 		// repositioning cards	
-	   if (drop_id.length <= 2)  // dropping this card on another card in column
-		  card_div.offset({ top: top_end += 25, left: left_end });    // reposition card into a column 
-	   else if (drop_id.charAt(0) === 'c')  {                  
-		   card_div.offset({ top: top_end+1, left: left_end+1 }); // reposition card into an empty column
-		   top_end += 25;
-	   }
-	   else 	   
-		  card_div.offset({ top: top_end+3, left: left_end+3 });  // reposition card into suit or free position
+	    if (drop_id.length <= 2)  // dropping this card on another card in column
+		    card_div.offset({ top: top_end += 25, left: left_end });    // reposition card into a column 
+	    else if (drop_id.charAt(0) === 'c')  {                  
+		    card_div.offset({ top: top_end+1, left: left_end+1 }); // reposition card into an empty column
+		    top_end += 25;
+	    }
+	    else 	   
+		    card_div.offset({ top: top_end+3, left: left_end+3 });  // reposition card into suit or free position
 	}
 };
 
-UI.prototype.dblclick_move = function(card_id, drop_id, this_ui) {
+UI.prototype.animated_move = function(card_id, drop_id, this_ui) {
     var offset_end, offset_current, drop_div, left_end, top_end, left_move,
         top_move, card, left_current, top_current, max_z;
 
@@ -733,15 +713,15 @@ UI.prototype.dblclick_move = function(card_id, drop_id, this_ui) {
     card.css('z-index', max_z + 1);
 
     //jQuery animate() Method) 
-    card.animate(  {top: '+=' + top_move, left: '+=' + left_move},   //{styles - CSS properties/values to animate}
-						   {duration:250,  easing:"swing", complete:
-							 function() {                                                           // callback - executed asynchronously after the animation completes                                
+    card.animate( {top: '+=' + top_move, left: '+=' + left_move},   //{styles - CSS properties/values to animate}
+						{duration:200,  easing:"swing", complete:
+						function() {                                                          // callback - executed asynchronously after the animation completes                                
 								this_ui.game.move_card(card_id, drop_id, false);     // tell the game the card has moved
 								document.getElementById('cards_left').innerHTML = "Cards left: " + this_ui.game.cards_left;
 								this_ui.clear_drag()();              //clear_drag() returns another function
 								this_ui.is_won();
 								}
-						   });
+						 });
 };
 
 
@@ -775,14 +755,14 @@ UI.prototype.create_droppables = function(stack_cards_id) {
 
         drag_id = parseInt($(this).attr('id'), 10);  //attr() method sets or returns attributes and values of the selected elements
 
-		if(stack_cards_id.length<=1)   //is it stacked drag?
-           drops = this_ui.game.valid_drop_ids(drag_id);
+		if(stack_cards_id.length<=1)    //is it stacked drag?
+            drops = this_ui.game.valid_drop_ids(drag_id);
 		else 
-		   drops = this_ui.game.valid_drop_ids(drag_id, true);   //stacked drags can only be dropped in columns
+		    drops = this_ui.game.valid_drop_ids(drag_id, true);   //stacked drags can only be dropped in columns
 	   
         drop_ids = drops[0];               //list of valid drops
 		empty_columns = drops[1];      //number of empty columns
-		free_cells = drops[2];             //number of free cells
+		free_cells = drops[2];              //number of free cells
 		
         drag_orig_offset = $(this).offset();   //store original drag position, in case drop fails
 		   
@@ -815,27 +795,27 @@ UI.prototype.create_droppables = function(stack_cards_id) {
 						simult_moves = Math.pow(2, empty_columns)*(free_cells+1);
 					
 					if(stack_cards_id.length > simult_moves)  {
-					   document.getElementById('moves_warning').innerHTML = "That move requires moving " + stack_cards_id.length + " cards. You only have enough free space to move " + simult_moves + ".";
-					   $('#moves_warning').dialog('open');
+					    document.getElementById('moves_warning').innerHTML = "That move requires moving " + stack_cards_id.length + " cards. You only have enough free space to move " + simult_moves + ".";
+					    $('#moves_warning').dialog('open');
 
-					   //manual return of failed drag
-					   card_div = $('#' + drag_id);					   
-					   offset_current = card_div.offset();
+					    //manual return of failed drag
+					    card_div = $('#' + drag_id);					   
+					    offset_current = card_div.offset();
 	   
-					   left_end = drag_orig_offset['left'];
-					   top_end = drag_orig_offset['top'];
-					   left_current = offset_current['left'];
-					   top_current = offset_current['top'];	
-					   left_move = left_end - left_current;
-					   top_move = top_end - top_current;	
+					    left_end = drag_orig_offset['left'];
+					    top_end = drag_orig_offset['top'];
+					    left_current = offset_current['left'];
+					    top_current = offset_current['top'];	
+					    left_move = left_end - left_current;
+					    top_move = top_end - top_current;	
 					   
-	                   //jQuery animate() Method
-					   card_div.animate(  {top:'+=' + top_move, left: '+=' + left_move},   //{styles - CSS properties/values to animate}
-						   {duration:200,  easing:"swing", complete:
+	                    //jQuery animate() Method
+					    card_div.animate(  {top:'+=' + top_move, left: '+=' + left_move},   //{styles - CSS properties/values to animate}
+						    {duration:200,  easing:"swing", complete:
 							 function() { this_ui.clear_drop(); }                     // callback - executed after the animation completes     
-						   });
+						    });
 					   
-					   return;
+					    return;
 					}
 
                     // tell the game that the card has been moved
@@ -856,20 +836,20 @@ UI.prototype.create_droppables = function(stack_cards_id) {
 					//loop through stacked dragged cards and graphically move cards
 					for(j=stack_cards_id.length-1; j>=0; j--)  {
 				   					   
-					   card_div = $('#' + stack_cards_id[j]);			
+					    card_div = $('#' + stack_cards_id[j]);			
 					   
-					   // before moving the card, stack it on top of all other cards
-                       max_z = this_ui.card_max_zindex();
-                       card_div.css('z-index', max_z + 1);
+					    // before moving the card, stack it on top of all other cards
+                        max_z = this_ui.card_max_zindex();
+                        card_div.css('z-index', max_z + 1);
 							
-					   if (this_id.length <= 2 )  // dropping this card on another card in column							
-					      card_div.offset({ top: top_end += 25, left: left_end });    // reposition card below the last one
-					   else if (this_id.charAt(0) === 'c') {     
-                          card_div.offset({ top: top_end+1, left: left_end+1 });      // reposition card into an empty column
-						  top_end += 25;
+					    if (this_id.length <= 2 )  // dropping this card on another card in column							
+					        card_div.offset({ top: top_end += 25, left: left_end });    // reposition card below the last one
+					    else if (this_id.charAt(0) === 'c') {     
+                            card_div.offset({ top: top_end+1, left: left_end+1 });      // reposition card into an empty column
+						    top_end += 25;
 					    }
                         else {
-                          card_div.offset({ top: top_end+3, left: left_end+3 });      // reposition card into free or suit cell
+                            card_div.offset({ top: top_end+3, left: left_end+3 });      // reposition card into free or suit cell
                         }						  
 					}	
 					/**************** added for stack moving******************/					
@@ -882,14 +862,24 @@ UI.prototype.create_droppables = function(stack_cards_id) {
     return droppers;
 };
 
-
 /*
  * Clear all drag items
  */
 UI.prototype.clear_drag = function() {
     var this_ui;
     this_ui = this;
-	
+
+    // dynamically sets table height based on longest column size
+	var table_heigtht, i, max_col_length = 7;
+    for (i = 0; i < 8; i++)
+    {
+       if(this_ui.game.columns[i].length >  max_col_length)
+	        max_col_length = this_ui.game.columns[i].length;
+    }
+	table_heigtht = 520 + 25*(max_col_length-7);
+	document.getElementById('table').style.height = table_heigtht.toString()+"px";
+
+   
     return function(event, ui) {
         var i, item;
 		
@@ -898,8 +888,7 @@ UI.prototype.clear_drag = function() {
             item = this_ui.drag[i];
             // remove hover classes
             item.unbind('mouseenter').unbind('mouseleave');
-            // force removal of highlight of cards that are dropped on the
-            // suit cells
+            // force removal of highlight of cards that are dropped on the suit cells
             $(this).removeClass('highlight');
             // remove double-click handler
             item.unbind('dblclick');
@@ -1070,10 +1059,10 @@ UI.prototype.undo = function() {
 UI.prototype.auto_drag_cb = function() {
     var this_ui = this;
     $('#auto_drag').click(function() {
-		this_ui.game.auto_drag = document.getElementById('auto_drag').checked;
+		this_ui.auto_complete = document.getElementById('auto_drag').checked;
 		
-		if(this_ui.game.auto_drag)
-		   this_ui.auto_drag();
+		if(this_ui.auto_complete)
+		    this_ui.auto_drag();
     });
 };
 
@@ -1081,7 +1070,6 @@ UI.prototype.auto_drag_cb = function() {
 
 var my_ui;
 $(document).ready(function() {
-    //var g, my_ui;
     var g;
 
     g = new Game();
