@@ -33,12 +33,12 @@ ul {
 .column {
 	position: relative;
 	float: left;
-	margin: 50px 5px 0px 5px;
+	margin: 50px 7px 0px 7px;
     width: 72px;
     height: 96px;
     border-style: solid;
-    border-width: 1px 1px 0px 1px;
-    border-color: #58FA58;
+    border-width: 2px 2px 0px 2px;
+    border-color: #f2c9a0;
     border-radius: 3px 3px 0px 0px;
     -moz-border-radius: 3px 3px 0px 0px;
     -webkit-border-radius: 3px 3px 0px 0px;
@@ -63,7 +63,7 @@ ul {
     height: 96px;
     border-style: solid;
     border-width: 3px;
-    border-color: #58FA58;
+    border-color: #c9fffd;
     margin: 3px;
     border-radius: 3px;
     -moz-border-radius: 3px;
@@ -80,12 +80,12 @@ ul {
     border-style: solid;
     border-width: 5px;
     border-color: black;
-    border-radius: 15px;
-    -moz-border-radius: 15px;
-    -webkit-border-radius: 15px;
-    -moz-box-shadow: 15px 15px 15px #888888;
-    -webkit-box-shadow: 15px 15px 15px #888888;
-    box-shadow: 15px 15px 15px #888888;
+    border-radius: 5px;
+    -moz-border-radius: 5px;
+    -webkit-border-radius: 5px;
+    -moz-box-shadow: 5px 5px 5px #888888;
+    -webkit-box-shadow: 5px 5px 5px #888888;
+    box-shadow: 5px 5px 5px #888888;
 }
 
 #buttons {
@@ -97,4 +97,7 @@ ul {
     font-size: 0.7em;
 }
 
-
+#footer {
+    display: flex;
+    justify-content: space-around;
+}
