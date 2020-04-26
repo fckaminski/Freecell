@@ -190,6 +190,8 @@ Game.prototype.move_card = function(drag_id, drop_id, undoing) {
 
     // get the card from its current location
     drag_column = this.get_cards(drag_id);
+	if(drag_column == null)
+		return false;
 	
 	//stores every move for the undoing playback
 	if(undoing==false) 
@@ -220,6 +222,7 @@ Game.prototype.move_card = function(drag_id, drop_id, undoing) {
 
         drop_id = drag_card.id.toString();   //last drag_id becomes the new drop_id		
 	}
+	return true;
 };
 
 /**
@@ -642,7 +645,7 @@ UI.prototype.auto_drag = function() {
 				     	        if(this.game.suits[k].value + 2>= drag_card.value)
 				                    do_drag++;
 				
-                    if(do_drag>=2)  {					
+                    if(do_drag>=2)  {				
                         this_ui.animated_move(card_id, 'suit' + j.toString(), this_ui);
                         return;  
                     }                         
@@ -708,6 +711,10 @@ UI.prototype.animated_move = function(card_id, drop_id, this_ui) {
     left_move = left_end - left_current + 3;
     top_move = top_end - top_current + 3;
 
+     // tell the game the card has moved
+	if(!this_ui.game.move_card(card_id, drop_id, false))
+        return;	
+	
     // before moving the card, stack it on top of all other cards
     max_z = this_ui.card_max_zindex();
     card.css('z-index', max_z + 1);
@@ -715,8 +722,7 @@ UI.prototype.animated_move = function(card_id, drop_id, this_ui) {
     //jQuery animate() Method) 
     card.animate( {top: '+=' + top_move, left: '+=' + left_move},   //{styles - CSS properties/values to animate}
 						{duration:200,  easing:"swing", complete:
-						function() {                                                          // callback - executed asynchronously after the animation completes                                
-								this_ui.game.move_card(card_id, drop_id, false);     // tell the game the card has moved
+						function() {                                                  // callback - executed asynchronously after the animation completes												
 								document.getElementById('cards_left').innerHTML = "Cards left: " + this_ui.game.cards_left;
 								this_ui.clear_drag()();              //clear_drag() returns another function
 								this_ui.is_won();
@@ -788,6 +794,10 @@ UI.prototype.create_droppables = function(stack_cards_id) {
 
                     this_id = $(this).attr('id');
 					
+					// tell the game that the card has been moved
+                    if(!this_ui.game.move_card(drag_id, this_id, false))
+						return;
+					
 					//calculates how many cards can be simulataneously moved
 					if (this_id.charAt(0) === 'c')  // reposition card into an empty column
 						simult_moves = Math.pow(2, empty_columns-1)*(free_cells+1);
@@ -818,8 +828,6 @@ UI.prototype.create_droppables = function(stack_cards_id) {
 					    return;
 					}
 
-                    // tell the game that the card has been moved
-                    this_ui.game.move_card(drag_id, this_id, false);
                     document.getElementById('cards_left').innerHTML = "Cards left: " + this_ui.game.cards_left;
 					
                     // has the game been completed
@@ -1010,6 +1018,46 @@ UI.prototype.moves_warning = function() {
         title: 'Freecell',
         modal: true,
         show: 'blind',
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
         autoOpen: false,
         zIndex: 5000
     });
