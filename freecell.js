@@ -794,10 +794,6 @@ UI.prototype.create_droppables = function(stack_cards_id) {
 
                     this_id = $(this).attr('id');
 					
-					// tell the game that the card has been moved
-                    if(!this_ui.game.move_card(drag_id, this_id, false))
-						return;
-					
 					//calculates how many cards can be simulataneously moved
 					if (this_id.charAt(0) === 'c')  // reposition card into an empty column
 						simult_moves = Math.pow(2, empty_columns-1)*(free_cells+1);
@@ -819,7 +815,7 @@ UI.prototype.create_droppables = function(stack_cards_id) {
 					    left_move = left_end - left_current;
 					    top_move = top_end - top_current;	
 					   
-	                    //jQuery animate() Method
+	                    //jQuery animate() Method. Return cards to origin if cant move the column stack
 					    card_div.animate(  {top:'+=' + top_move, left: '+=' + left_move},   //{styles - CSS properties/values to animate}
 						    {duration:200,  easing:"swing", complete:
 							 function() { this_ui.clear_drop(); }                     // callback - executed after the animation completes     
@@ -827,6 +823,10 @@ UI.prototype.create_droppables = function(stack_cards_id) {
 					   
 					    return;
 					}
+					
+					// tell the game that the card has been moved
+                    if(!this_ui.game.move_card(drag_id, this_id, false))
+						return;
 
                     document.getElementById('cards_left').innerHTML = "Cards left: " + this_ui.game.cards_left;
 					
