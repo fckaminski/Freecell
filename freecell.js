@@ -721,7 +721,7 @@ UI.prototype.animated_move = function(card_id, drop_id, this_ui) {
 
     //jQuery animate() Method) 
     card.animate( {top: '+=' + top_move, left: '+=' + left_move},   //{styles - CSS properties/values to animate}
-						{duration:200,  easing:"swing", complete:
+						{duration:100,  easing:"swing", complete:
 						function() {                                                  // callback - executed asynchronously after the animation completes												
 								document.getElementById('cards_left').innerHTML = "Cards left: " + this_ui.game.cards_left;
 								this_ui.clear_drag()();              //clear_drag() returns another function
@@ -884,7 +884,7 @@ UI.prototype.clear_drag = function() {
        if(this_ui.game.columns[i].length >  max_col_length)
 	        max_col_length = this_ui.game.columns[i].length;
     }
-	table_heigtht = 520 + 25*(max_col_length-7);
+	table_heigtht = 500 + 25*(max_col_length-7);
 	document.getElementById('table').style.height = table_heigtht.toString()+"px";
 
    
@@ -1017,47 +1017,7 @@ UI.prototype.moves_warning = function() {
     $('#moves_warning').dialog({
         title: 'Freecell',
         modal: true,
-        show: 'blind',
-		
-		
-		
-		
-		
-		
-		
-		
-		
-		
-		
-		
-		
-		
-		
-		
-		
-		
-		
-		
-		
-		
-		
-		
-		
-		
-		
-		
-		
-		
-		
-		
-		
-		
-		
-		
-		
-		
-		
-		
+        show: 'blind',	
         autoOpen: false,
         zIndex: 5000
     });
